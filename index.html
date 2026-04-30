@@ -1,254 +1,201 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>MTG Mulligan Model</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>Learning Mulligan Decisions</title> <link rel="stylesheet" href="styles.css"> </head> <body> <!-- HERO --> <section id="hero"> <h1>Learning Mulligan Decisions in Magic: The Gathering</h1>
+<p class="subtitle">
+    Modeling one of the most important early-game decisions using data
+</p>
 
-<body>
+<div class="hero-buttons">
+    <a href="https://github.com/londonglenn/mtg_mulligan_tool" target="_blank">Tool Repo</a>
+    <a href="https://github.com/londonglenn/mtg-mulligan-model" target="_blank">Model Repo</a>
+</div>
+</section> <!-- OVERVIEW --> <section> <h2>Overview</h2>
+<p>
+    Mulligan decisions are one of the highest-impact choices in Magic: The Gathering.
+    Given only your opening hand, you must decide whether to keep or redraw—
+    trading immediate playability against long-term resources.
+</p>
 
-<section id="hero">
-    <h1>Learning Mulligan Decisions in Magic: The Gathering</h1>
+<p>
+    In this project, I model this decision as a probability:
+</p>
 
-    <p class="subtitle">
-        A data-driven model for predicting whether to keep or mulligan an opening hand
-    </p>
+<p class="equation">
+    P(Keep | Hand)
+</p>
 
-    <div class="hero-buttons">
-        <a href="https://github.com/londonglenn/mtg_mulligan_tool" target="_blank">Tool Repo</a>
-        <a href="https://github.com/londonglenn/mtg-mulligan-model" target="_blank">Model Repo</a>
-    </div>
-</section>
+<p>
+    Using real player data, I train models to predict this decision and analyze what actually matters.
+</p>
 
-<section id="abstract">
-    <h2>Overview</h2>
+<p class="highlight">
+    Key result: Most of the decision is driven by mana (land count), not card complexity.
+</p>
+</section> <!-- PROBLEM --> <section> <h2>The Decision Problem</h2>
+<p>
+    A mulligan decision is fundamentally a tradeoff:
+</p>
 
-    <p>
-        Mulligan decisions in <i>Magic: The Gathering</i> are high-impact choices made at the very start of the game,
-        where players must evaluate the strength of their opening hand with limited information.
-        Despite their importance, these decisions are usually guided by informal heuristics rather than data-driven methods.
-    </p>
+<ul>
+    <li>Keep → risk a weak hand</li>
+    <li>Mulligan → lose a card</li>
+</ul>
 
-    <p>
-        In this project, I model mulligan decisions as a probabilistic prediction problem:
-    </p>
+<p>
+    Ideally, you would compare:
+</p>
 
-    <p class="equation">
-        P(Keep | Hand)
-    </p>
+<p class="equation">
+    E[Win | Keep, S] vs E[Win | Mulligan, S]
+</p>
 
-    <p>
-        Using a custom-built data collection tool, I gathered real player decisions and represented each hand
-        using structured features such as land count, card identity, mana curve, and play/draw context.
-    </p>
+<p>
+    But this is impossible to compute due to randomness, hidden information,
+    and the massive number of possible game outcomes.
+</p>
+</section> <!-- WHY HARD --> <section> <h2>Why This Is Hard</h2>
+<ul>
+    <li>Partial observability (you don’t know future draws)</li>
+    <li>Huge combinatorial space of hands</li>
+    <li>Complex interactions between cards</li>
+</ul>
 
-    <p>
-        I trained and evaluated multiple models, including logistic regression, XGBoost, and LightGBM,
-        using 5-fold cross-validation. All models achieved strong performance, with ROC-AUC above 0.90.
-    </p>
+<p>
+    As a result, players rely on heuristics like “2–3 lands is good”—
+    but these rules are informal and hard to analyze.
+</p>
+</section> <!-- APPROACH --> <section> <h2>Approach</h2>
+<p>
+    Instead of solving the full game, we learn directly from player behavior:
+</p>
 
-    <p>
-        The most important finding is that <b>simple, interpretable features — especially land count — capture most of the decision signal</b>.
-    </p>
-</section>
+<p class="equation">
+    P(Keep | S)
+</p>
 
-<section id="introduction">
-    <h2>The Decision Problem</h2>
+<p>
+    where S represents the opening hand and context.
+</p>
 
-    <p>
-        Mulligan decisions are one of the first and most important choices in a game of 
-        <i>Magic: The Gathering</i>. Given an opening hand of seven cards, a player must decide:
-        <b>keep the hand or mulligan.</b>
-    </p>
+<h3>Decision Rule</h3>
+<p class="equation">
+    Keep if P(Keep | S) &gt; τ
+</p>
 
-    <p>
-        This is a high-stakes tradeoff. Keeping a weak hand risks losing the game,
-        while mulliganing sacrifices resources.
-    </p>
+<h3>Learning Setup</h3>
+<ul>
+    <li>Binary classification (Keep vs Mulligan)</li>
+    <li>Trained using log loss (probability calibration)</li>
+    <li>5-fold cross-validation</li>
+</ul>
+</section> <!-- DATA --> <section> <h2>Data Collection</h2>
+<p>
+    There is no public dataset for mulligan decisions, so I built a custom tool.
+</p>
 
-    <img src="assets/Example_hand.png" width="600">
-</section>
+<img src="assets/data_collection_tool.png">
 
-<section>
-    <h2>Why This Is Hard</h2>
+<p>
+    Players are shown random hands and choose keep or mulligan.
+    This converts human intuition into labeled training data.
+</p>
+</section> <!-- FEATURES --> <section> <h2>Feature Design</h2>
+<ul>
+    <li><b>Land count:</b> captures mana availability</li>
+    <li><b>Card identity:</b> which cards appear</li>
+    <li><b>Mana curve:</b> distribution of costs</li>
+    <li><b>Play/Draw:</b> context matters</li>
+</ul>
 
-    <ul>
-        <li>Hidden information</li>
-        <li>Randomness</li>
-        <li>Huge number of possible hands</li>
-    </ul>
-</section>
+<p class="highlight">
+    Design assumption: decisions are driven primarily by mana consistency
+</p>
 
-<section>
-    <h2>The Ideal Decision (But Infeasible)</h2>
+<p class="equation">
+    Decision ≈ f(mana) + g(cards)
+</p>
+</section> <!-- RESULTS --> <section> <h2>Model Performance</h2>
+<img src="assets/model_comparison.png">
 
-    <p class="equation">
-        E[Win | Keep, S] vs E[Win | Mulligan, S]
-    </p>
+<p>
+    All models achieve strong performance (ROC-AUC > 0.90).
+    Surprisingly, simple logistic regression performs nearly as well as more complex models.
+</p>
 
-    <p>
-        This is impossible to compute exactly, so players rely on intuition.
-    </p>
-</section>
+<p>
+    This suggests that feature design matters more than model complexity.
+</p>
+</section> <!-- ABLATION --> <section> <h2>What Actually Matters?</h2>
+<img src="assets/ablation_auc.png">
 
-<section>
-    <h2>Our Approach</h2>
+<p>
+    Removing land features significantly hurts performance,
+    while removing card features has a smaller effect.
+</p>
 
-    <p class="equation">
-        P(Keep | S)
-    </p>
+<p class="highlight">
+    Land count alone explains most of the decision.
+</p>
+</section> <!-- INTERPRETATION --> <section> <h2>Interpreting the Model</h2>
+<img src="assets/land_curve.png">
 
-    <p>
-        Instead of solving the game, we learn from real player decisions.
-    </p>
-</section>
+<p>
+    The model learns a nonlinear relationship:
+</p>
 
-<section>
-    <h2>What This Project Does</h2>
+<ul>
+    <li>2–3 lands → highest keep probability</li>
+    <li>Too few or too many → bad</li>
+</ul>
 
-    <ul>
-        <li>Collects mulligan decisions</li>
-        <li>Builds feature representations</li>
-        <li>Trains ML models</li>
-        <li>Analyzes what matters</li>
-    </ul>
-</section>
+<p>
+    This matches real player intuition—but now we can quantify it.
+</p>
+</section> <!-- INSIGHT --> <section> <h2>Key Insight</h2>
+<p class="highlight">
+    Mulligan decisions are mostly a resource problem, not a card problem.
+</p>
 
-<section id="related-work">
-    <h2>What Has Been Tried Before?</h2>
+<p>
+    We can decompose the decision:
+</p>
 
-    <p>
-        Prior work focuses on full-game simulation, heuristics, or card representations—
-        but not directly on mulligan decisions from player data.
-    </p>
-</section>
+<p class="equation">
+    π(S) = π_land(S) + δ_card(S)
+</p>
 
-<section>
-    <h3>Reinforcement Learning</h3>
-    <p>Powerful but complex and focused on full gameplay.</p>
-</section>
+<p>
+    Land consistency determines the baseline,
+    and cards make small adjustments.
+</p>
+</section> <!-- DEMO --> <section> <h2>Interactive Demo</h2>
+<video width="600" controls>
+    <source src="assets/demo.mp4" type="video/mp4">
+</video>
 
-<section>
-    <h3>Heuristics</h3>
-    <p>Simple but not generalizable.</p>
-</section>
+<p>
+    The demo shows the model evaluating real hands and outputting a keep probability.
+    This allows players to compare their intuition against the model.
+</p>
+</section> <!-- LIMITATIONS --> <section> <h2>Limitations</h2>
+<ul>
+    <li>Limited dataset size</li>
+    <li>No deck archetype modeling</li>
+    <li>Reflects player behavior, not optimal play</li>
+</ul>
+</section> <!-- FUTURE --> <section> <h2>Future Work</h2>
+<ul>
+    <li>Incorporate deck archetypes</li>
+    <li>Model card synergy explicitly</li>
+    <li>Predict win probability directly</li>
+    <li>Scale data collection</li>
+</ul>
+</section> <!-- CONCLUSION --> <section> <h2>Conclusion</h2>
+<p>
+    Despite the complexity of Magic, mulligan decisions follow a simple structure:
+    they are dominated by mana consistency.
+</p>
 
-<section>
-    <h3>Representation Learning</h3>
-    <p>Useful for drafting, not mulligans.</p>
-</section>
-
-<section>
-    <h3>Why This Work Is Different</h3>
-    <p class="highlight">
-        This project learns directly from real player decisions.
-    </p>
-</section>
-
-<!-- ✅ APPROACH STARTS HERE -->
-
-<section id="approach">
-    <h2>How the Model Works</h2>
-
-    <p class="equation">
-        P(Keep | S)
-    </p>
-
-    <p>
-        The model predicts the probability of keeping a hand.
-    </p>
-</section>
-
-<section>
-    <h3>Decision Rule</h3>
-
-    <p class="equation">
-        Keep if P(Keep | S) &gt; τ
-    </p>
-</section>
-
-<section>
-    <h3>Learning Setup</h3>
-
-    <p>
-        Binary classification:
-    </p>
-
-    <p class="equation">
-        Keep = 1, Mulligan = 0
-    </p>
-
-    <p>
-        Trained using log loss.
-    </p>
-</section>
-
-<section>
-    <h3>Models</h3>
-
-    <ul>
-        <li>Logistic Regression</li>
-        <li>XGBoost</li>
-        <li>LightGBM</li>
-    </ul>
-</section>
-
-<section>
-    <h3>Data Collection</h3>
-
-    <p>
-        Custom tool generates hands and records player decisions.
-    </p>
-
-    <img src="assets/data_collection_tool.png" width="700">
-</section>
-
-<section>
-    <h3>Features</h3>
-
-    <ul>
-        <li>Land count</li>
-        <li>Card identity</li>
-        <li>Mana curve</li>
-        <li>Play/draw</li>
-    </ul>
-</section>
-
-<section>
-    <h3>Key Insight</h3>
-
-    <p class="highlight">
-        Decisions are dominated by mana consistency.
-    </p>
-
-    <p class="equation">
-        Decision ≈ f(mana) + g(cards)
-    </p>
-</section>
-
-<!-- ✅ APPROACH ENDS -->
-
-<section>
-    <h2>Results</h2>
-    <img src="assets/model_comparison.png" width="600">
-</section>
-
-<section>
-    <h2>Key Insight</h2>
-    <img src="assets/land_curve.png" width="600">
-</section>
-
-<section>
-    <h2>Demo</h2>
-    <video width="600" controls>
-        <source src="assets/demo.mp4" type="video/mp4">
-    </video>
-</section>
-
-<footer>
-    <p>© London Glenn</p>
-</footer>
-
-</body>
-</html>
+<p>
+    This suggests that even complex strategic decisions can often be approximated
+    with interpretable, low-dimensional models.
+</p>
+</section> <footer> <p>© London Glenn</p> </footer> </body> </html> :::
