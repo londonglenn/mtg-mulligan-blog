@@ -45,292 +45,204 @@
 
     <p>
         I trained and evaluated multiple models, including logistic regression, XGBoost, and LightGBM,
-        using 5-fold cross-validation. All models achieved strong performance, with ROC-AUC above 0.90,
-        indicating that mulligan decisions can be predicted reliably.
+        using 5-fold cross-validation. All models achieved strong performance, with ROC-AUC above 0.90.
     </p>
 
     <p>
         The most important finding is that <b>simple, interpretable features — especially land count — capture most of the decision signal</b>.
-        More complex models provide only marginal improvements, suggesting that mulligan decisions are driven primarily
-        by mana consistency.
-    </p>
-
-    <p>
-        More broadly, this project shows that even complex strategic decisions can often be approximated using
-        compact, interpretable representations, enabling practical decision-support tools for competitive play.
     </p>
 </section>
 
 <section id="introduction">
-
     <h2>The Decision Problem</h2>
 
     <p>
         Mulligan decisions are one of the first and most important choices in a game of 
         <i>Magic: The Gathering</i>. Given an opening hand of seven cards, a player must decide:
-        <b>keep the hand or mulligan and redraw with fewer resources.</b>
+        <b>keep the hand or mulligan.</b>
     </p>
 
     <p>
-        This is a high-stakes tradeoff. Keeping a weak hand can lead to an unplayable game,
-        while mulliganing sacrifices card advantage and long-term resources.
+        This is a high-stakes tradeoff. Keeping a weak hand risks losing the game,
+        while mulliganing sacrifices resources.
     </p>
 
-    <!-- OPTIONAL: Add example hand image here -->
     <img src="assets/Example_hand.png" width="600">
-
 </section>
 
-
 <section>
-
     <h2>Why This Is Hard</h2>
 
-    <p>
-        At first glance, this decision seems simple — many players follow rules like
-        “2–3 lands is good.” But in reality, mulligan decisions are much more complex.
-    </p>
-
-    <p>
-        The game involves:
-    </p>
-
     <ul>
-        <li>Hidden information (future draws are unknown)</li>
-        <li>Randomness (card order and outcomes vary)</li>
-        <li>A massive number of possible hand combinations</li>
+        <li>Hidden information</li>
+        <li>Randomness</li>
+        <li>Huge number of possible hands</li>
     </ul>
-
-    <p>
-        Because of this, most players rely on heuristics rather than formal reasoning.
-        These heuristics work, but they are difficult to analyze, compare, or generalize
-        across different decks and matchups.
-    </p>
-
 </section>
 
-
 <section>
-
     <h2>The Ideal Decision (But Infeasible)</h2>
-
-    <p>
-        In theory, the correct decision would compare:
-    </p>
 
     <p class="equation">
         E[Win | Keep, S] vs E[Win | Mulligan, S]
     </p>
 
     <p>
-        where <i>S</i> represents the current hand and game context.
+        This is impossible to compute exactly, so players rely on intuition.
     </p>
-
-    <p>
-        However, computing this exactly is impossible in practice due to:
-    </p>
-
-    <ul>
-        <li>The combinatorial number of possible hands</li>
-        <li>Uncertainty about future draws</li>
-        <li>The complexity of full game outcomes</li>
-    </ul>
-
-    <p>
-        As a result, players rely on intuitive approximations of this comparison.
-    </p>
-
 </section>
 
-
 <section>
-
     <h2>Our Approach</h2>
-
-    <p>
-        Instead of trying to compute the optimal decision directly, we take a different approach:
-        <b>learn from real player behavior.</b>
-    </p>
-
-    <p>
-        We model the decision as:
-    </p>
 
     <p class="equation">
         P(Keep | S)
     </p>
 
     <p>
-        This treats observed player decisions as noisy but informative signals of the underlying
-        decision boundary.
+        Instead of solving the game, we learn from real player decisions.
     </p>
-
-    <p>
-        The key challenge is representing a hand in a way that a model can understand.
-        Each hand contains complex interactions between:
-    </p>
-
-    <ul>
-        <li>Mana availability (land count)</li>
-        <li>Card composition</li>
-        <li>Mana curve</li>
-        <li>Play vs draw context</li>
-    </ul>
-
 </section>
 
-
 <section>
-
     <h2>What This Project Does</h2>
 
     <ul>
-        <li>Builds a dataset of real mulligan decisions using a custom tool</li>
-        <li>Designs a structured, interpretable feature representation of hands</li>
-        <li>Trains both linear and nonlinear models</li>
-        <li>Uses ablation studies to understand what actually matters</li>
+        <li>Collects mulligan decisions</li>
+        <li>Builds feature representations</li>
+        <li>Trains ML models</li>
+        <li>Analyzes what matters</li>
     </ul>
-
 </section>
 
 <section id="related-work">
-
     <h2>What Has Been Tried Before?</h2>
 
     <p>
-        Modeling decision-making in <i>Magic: The Gathering</i> is not new—but most prior work focuses
-        on different parts of the game or uses very different approaches.
+        Prior work focuses on full-game simulation, heuristics, or card representations—
+        but not directly on mulligan decisions from player data.
     </p>
-
 </section>
 
-
 <section>
-
-    <h3>Reinforcement Learning (Full Game Simulation)</h3>
-
-    <p>
-        One major approach is reinforcement learning, where agents learn to play the entire game
-        through simulation, self-play, and search.
-    </p>
-
-    <p>
-        While powerful, these methods are:
-    </p>
-
-    <ul>
-        <li>Computationally expensive</li>
-        <li>Highly complex to implement</li>
-        <li>Focused on full-game strategies rather than specific decisions</li>
-    </ul>
-
-    <p>
-        As a result, they do not directly address isolated decisions like mulligans.
-    </p>
-
+    <h3>Reinforcement Learning</h3>
+    <p>Powerful but complex and focused on full gameplay.</p>
 </section>
 
-
 <section>
-
-    <h3>Heuristic and Strategy-Based Methods</h3>
-
-    <p>
-        Another approach uses handcrafted rules and strategy metrics to evaluate opening hands.
-        For example, some methods measure how well a hand supports a predefined game plan.
-    </p>
-
-    <p>
-        These approaches can work well in specific cases, but they:
-    </p>
-
-    <ul>
-        <li>Depend heavily on manual design</li>
-        <li>Do not adapt easily across decks</li>
-        <li>Do not learn from real player data</li>
-    </ul>
-
+    <h3>Heuristics</h3>
+    <p>Simple but not generalizable.</p>
 </section>
 
-
 <section>
-
-    <h3>Representation Learning (Card Embeddings)</h3>
-
-    <p>
-        Some research focuses on learning representations of cards using neural networks,
-        particularly for drafting and deck-building tasks.
-    </p>
-
-    <p>
-        These methods improve generalization across cards and formats,
-        but they target <b>deck construction</b> rather than in-game decisions like mulligans.
-    </p>
-
+    <h3>Representation Learning</h3>
+    <p>Useful for drafting, not mulligans.</p>
 </section>
 
-
 <section>
-
-    <h3>Why This Project Is Different</h3>
-
+    <h3>Why This Work Is Different</h3>
     <p class="highlight">
-        Instead of simulating the game or designing rules, this project learns directly from real player decisions.
+        This project learns directly from real player decisions.
+    </p>
+</section>
+
+<!-- ✅ APPROACH STARTS HERE -->
+
+<section id="approach">
+    <h2>How the Model Works</h2>
+
+    <p class="equation">
+        P(Keep | S)
     </p>
 
     <p>
-        We model mulligans as a supervised learning problem:
+        The model predicts the probability of keeping a hand.
+    </p>
+</section>
+
+<section>
+    <h3>Decision Rule</h3>
+
+    <p class="equation">
+        Keep if P(Keep | S) &gt; τ
+    </p>
+</section>
+
+<section>
+    <h3>Learning Setup</h3>
+
+    <p>
+        Binary classification:
     </p>
 
     <p class="equation">
-        P(Keep | Hand)
+        Keep = 1, Mulligan = 0
     </p>
 
     <p>
-        This approach has several advantages:
+        Trained using log loss.
     </p>
-
-    <ul>
-        <li>Focuses on a single high-impact decision</li>
-        <li>Uses real player behavior instead of simulated play</li>
-        <li>Produces interpretable results</li>
-    </ul>
-
 </section>
-
 
 <section>
+    <h3>Models</h3>
 
-    <h3>Key Takeaway</h3>
-
-    <p>
-        While Magic is an extremely complex game, this work shows that individual decisions
-        like mulligans may have a much simpler structure.
-    </p>
-
-    <p>
-        Instead of requiring full-game modeling, we can isolate and understand decision points
-        using compact, data-driven representations.
-    </p>
-
+    <ul>
+        <li>Logistic Regression</li>
+        <li>XGBoost</li>
+        <li>LightGBM</li>
+    </ul>
 </section>
+
+<section>
+    <h3>Data Collection</h3>
+
+    <p>
+        Custom tool generates hands and records player decisions.
+    </p>
+
+    <img src="assets/data_collection_tool.png" width="700">
+</section>
+
+<section>
+    <h3>Features</h3>
+
+    <ul>
+        <li>Land count</li>
+        <li>Card identity</li>
+        <li>Mana curve</li>
+        <li>Play/draw</li>
+    </ul>
+</section>
+
+<section>
+    <h3>Key Insight</h3>
+
+    <p class="highlight">
+        Decisions are dominated by mana consistency.
+    </p>
+
+    <p class="equation">
+        Decision ≈ f(mana) + g(cards)
+    </p>
+</section>
+
+<!-- ✅ APPROACH ENDS -->
 
 <section>
     <h2>Results</h2>
-    <img src="assets/model_comparison.png" width="600" alt="Model comparison chart">
+    <img src="assets/model_comparison.png" width="600">
 </section>
 
 <section>
     <h2>Key Insight</h2>
-    <p>Most decisions are driven by land count...</p>
-    <img src="assets/land_curve.png" width="600" alt="Land count keep probability curve">
+    <img src="assets/land_curve.png" width="600">
 </section>
 
 <section>
     <h2>Demo</h2>
     <video width="600" controls>
         <source src="assets/demo.mp4" type="video/mp4">
-        Your browser does not support the video tag.
     </video>
 </section>
 
