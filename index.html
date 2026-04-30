@@ -61,9 +61,136 @@
     </p>
 </section>
 
+<section id="introduction">
+
+    <h2>The Decision Problem</h2>
+
+    <p>
+        Mulligan decisions are one of the first and most important choices in a game of 
+        <i>Magic: The Gathering</i>. Given an opening hand of seven cards, a player must decide:
+        <b>keep the hand or mulligan and redraw with fewer resources.</b>
+    </p>
+
+    <p>
+        This is a high-stakes tradeoff. Keeping a weak hand can lead to an unplayable game,
+        while mulliganing sacrifices card advantage and long-term resources.
+    </p>
+
+    <!-- OPTIONAL: Add example hand image here -->
+    <!-- <img src="assets/example_hand.png" width="600"> -->
+
+</section>
+
+
 <section>
-    <h2>Problem</h2>
-    <p>Mulligan decisions are critical early-game choices under uncertainty...</p>
+
+    <h2>Why This Is Hard</h2>
+
+    <p>
+        At first glance, this decision seems simple — many players follow rules like
+        “2–3 lands is good.” But in reality, mulligan decisions are much more complex.
+    </p>
+
+    <p>
+        The game involves:
+    </p>
+
+    <ul>
+        <li>Hidden information (future draws are unknown)</li>
+        <li>Randomness (card order and outcomes vary)</li>
+        <li>A massive number of possible hand combinations</li>
+    </ul>
+
+    <p>
+        Because of this, most players rely on heuristics rather than formal reasoning.
+        These heuristics work, but they are difficult to analyze, compare, or generalize
+        across different decks and matchups.
+    </p>
+
+</section>
+
+
+<section>
+
+    <h2>The Ideal Decision (But Infeasible)</h2>
+
+    <p>
+        In theory, the correct decision would compare:
+    </p>
+
+    <p class="equation">
+        E[Win | Keep, S] vs E[Win | Mulligan, S]
+    </p>
+
+    <p>
+        where <i>S</i> represents the current hand and game context.
+    </p>
+
+    <p>
+        However, computing this exactly is impossible in practice due to:
+    </p>
+
+    <ul>
+        <li>The combinatorial number of possible hands</li>
+        <li>Uncertainty about future draws</li>
+        <li>The complexity of full game outcomes</li>
+    </ul>
+
+    <p>
+        As a result, players rely on intuitive approximations of this comparison.
+    </p>
+
+</section>
+
+
+<section>
+
+    <h2>Our Approach</h2>
+
+    <p>
+        Instead of trying to compute the optimal decision directly, we take a different approach:
+        <b>learn from real player behavior.</b>
+    </p>
+
+    <p>
+        We model the decision as:
+    </p>
+
+    <p class="equation">
+        P(Keep | S)
+    </p>
+
+    <p>
+        This treats observed player decisions as noisy but informative signals of the underlying
+        decision boundary.
+    </p>
+
+    <p>
+        The key challenge is representing a hand in a way that a model can understand.
+        Each hand contains complex interactions between:
+    </p>
+
+    <ul>
+        <li>Mana availability (land count)</li>
+        <li>Card composition</li>
+        <li>Mana curve</li>
+        <li>Play vs draw context</li>
+    </ul>
+
+</section>
+
+
+<section>
+
+    <h2>What This Project Does</h2>
+
+    <ul>
+        <li>Builds a dataset of real mulligan decisions using a custom tool</li>
+        <li>Designs a structured, interpretable feature representation of hands</li>
+        <li>Trains both linear and nonlinear models</li>
+        <li>Uses ablation studies to understand what actually matters</li>
+    </ul>
+
 </section>
 
 <section>
