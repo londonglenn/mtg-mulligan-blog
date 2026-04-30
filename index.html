@@ -77,7 +77,7 @@
     </p>
 
     <!-- OPTIONAL: Add example hand image here -->
-    <img src="assets/example_hand.png" width="600">
+    <img src="assets/Example_hand.png" width="600">
 
 </section>
 
@@ -193,9 +193,126 @@
 
 </section>
 
+<section id="related-work">
+
+    <h2>What Has Been Tried Before?</h2>
+
+    <p>
+        Modeling decision-making in <i>Magic: The Gathering</i> is not new—but most prior work focuses
+        on different parts of the game or uses very different approaches.
+    </p>
+
+</section>
+
+
 <section>
-    <h2>Approach</h2>
-    <p>We model decisions as P(Keep | S)...</p>
+
+    <h3>Reinforcement Learning (Full Game Simulation)</h3>
+
+    <p>
+        One major approach is reinforcement learning, where agents learn to play the entire game
+        through simulation, self-play, and search.
+    </p>
+
+    <p>
+        While powerful, these methods are:
+    </p>
+
+    <ul>
+        <li>Computationally expensive</li>
+        <li>Highly complex to implement</li>
+        <li>Focused on full-game strategies rather than specific decisions</li>
+    </ul>
+
+    <p>
+        As a result, they do not directly address isolated decisions like mulligans.
+    </p>
+
+</section>
+
+
+<section>
+
+    <h3>Heuristic and Strategy-Based Methods</h3>
+
+    <p>
+        Another approach uses handcrafted rules and strategy metrics to evaluate opening hands.
+        For example, some methods measure how well a hand supports a predefined game plan.
+    </p>
+
+    <p>
+        These approaches can work well in specific cases, but they:
+    </p>
+
+    <ul>
+        <li>Depend heavily on manual design</li>
+        <li>Do not adapt easily across decks</li>
+        <li>Do not learn from real player data</li>
+    </ul>
+
+</section>
+
+
+<section>
+
+    <h3>Representation Learning (Card Embeddings)</h3>
+
+    <p>
+        Some research focuses on learning representations of cards using neural networks,
+        particularly for drafting and deck-building tasks.
+    </p>
+
+    <p>
+        These methods improve generalization across cards and formats,
+        but they target <b>deck construction</b> rather than in-game decisions like mulligans.
+    </p>
+
+</section>
+
+
+<section>
+
+    <h3>Why This Project Is Different</h3>
+
+    <p class="highlight">
+        Instead of simulating the game or designing rules, this project learns directly from real player decisions.
+    </p>
+
+    <p>
+        We model mulligans as a supervised learning problem:
+    </p>
+
+    <p class="equation">
+        P(Keep | Hand)
+    </p>
+
+    <p>
+        This approach has several advantages:
+    </p>
+
+    <ul>
+        <li>Focuses on a single high-impact decision</li>
+        <li>Uses real player behavior instead of simulated play</li>
+        <li>Produces interpretable results</li>
+    </ul>
+
+</section>
+
+
+<section>
+
+    <h3>Key Takeaway</h3>
+
+    <p>
+        While Magic is an extremely complex game, this work shows that individual decisions
+        like mulligans may have a much simpler structure.
+    </p>
+
+    <p>
+        Instead of requiring full-game modeling, we can isolate and understand decision points
+        using compact, data-driven representations.
+    </p>
+
 </section>
 
 <section>
