@@ -5,14 +5,61 @@
     <title>MTG Mulligan Model</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<header>
+<section id="hero">
     <h1>Learning Mulligan Decisions in Magic: The Gathering</h1>
-    <p>A data-driven model to predict Keep vs Mulligan decisions</p>
-    <a href="https://github.com/londonglenn/mtg_mulligan_tool">Tool Repo</a> |
-    <a href="https://github.com/londonglenn/mtg-mulligan-model">Model Repo</a>
-</header>
+
+    <p class="subtitle">
+        A data-driven model for predicting whether to keep or mulligan an opening hand
+    </p>
+
+    <div class="hero-buttons">
+        <a href="https://github.com/londonglenn/mtg_mulligan_tool" target="_blank">Tool Repo</a>
+        <a href="https://github.com/londonglenn/mtg-mulligan-model" target="_blank">Model Repo</a>
+    </div>
+</section>
+
+<section id="abstract">
+    <h2>Overview</h2>
+
+    <p>
+        Mulligan decisions in <i>Magic: The Gathering</i> are high-impact choices made at the very start of the game,
+        where players must evaluate the strength of their opening hand with limited information.
+        Despite their importance, these decisions are usually guided by informal heuristics rather than data-driven methods.
+    </p>
+
+    <p>
+        In this project, I model mulligan decisions as a probabilistic prediction problem:
+    </p>
+
+    <p class="equation">
+        P(Keep | Hand)
+    </p>
+
+    <p>
+        Using a custom-built data collection tool, I gathered real player decisions and represented each hand
+        using structured features such as land count, card identity, mana curve, and play/draw context.
+    </p>
+
+    <p>
+        I trained and evaluated multiple models, including logistic regression, XGBoost, and LightGBM,
+        using 5-fold cross-validation. All models achieved strong performance, with ROC-AUC above 0.90,
+        indicating that mulligan decisions can be predicted reliably.
+    </p>
+
+    <p>
+        The most important finding is that <b>simple, interpretable features — especially land count — capture most of the decision signal</b>.
+        More complex models provide only marginal improvements, suggesting that mulligan decisions are driven primarily
+        by mana consistency.
+    </p>
+
+    <p>
+        More broadly, this project shows that even complex strategic decisions can often be approximated using
+        compact, interpretable representations, enabling practical decision-support tools for competitive play.
+    </p>
+</section>
 
 <section>
     <h2>Problem</h2>
@@ -26,19 +73,20 @@
 
 <section>
     <h2>Results</h2>
-    <img src="assets/model_comparison.png" width="600">
+    <img src="assets/model_comparison.png" width="600" alt="Model comparison chart">
 </section>
 
 <section>
     <h2>Key Insight</h2>
     <p>Most decisions are driven by land count...</p>
-    <img src="assets/land_curve.png" width="600">
+    <img src="assets/land_curve.png" width="600" alt="Land count keep probability curve">
 </section>
 
 <section>
     <h2>Demo</h2>
     <video width="600" controls>
         <source src="assets/demo.mp4" type="video/mp4">
+        Your browser does not support the video tag.
     </video>
 </section>
 
