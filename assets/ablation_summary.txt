@@ -1,0 +1,27 @@
+Ablation Analysis Summary
+=========================
+
+Loaded 12 most recent runs
+Dataset IDs: ds_20260429_212329_6a56deca
+
+Top runs
+--------
+Best ROC-AUC: xgboost / full (0.926)
+Best log loss: lightgbm / full (0.343)
+
+Delta vs full feature set
+-------------------------
+logreg_l1:
+  no_mana_buckets: ΔAUC=-0.005, Δlogloss=+0.006
+  land_only: ΔAUC=-0.051, Δlogloss=+0.068
+  cards_only: ΔAUC=-0.302, Δlogloss=+0.300
+
+xgboost:
+  no_mana_buckets: ΔAUC=-0.007, Δlogloss=+0.013
+  land_only: ΔAUC=-0.075, Δlogloss=+0.078
+  cards_only: ΔAUC=-0.152, Δlogloss=+0.189
+
+lightgbm:
+  no_mana_buckets: ΔAUC=-0.004, Δlogloss=+0.003
+  land_only: ΔAUC=-0.081, Δlogloss=+0.079
+  cards_only: ΔAUC=-0.161, Δlogloss=+0.207
